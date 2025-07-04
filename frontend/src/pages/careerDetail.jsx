@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const SectionCard = ({ title, children, onEdit }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 w-full">
     <div className="flex items-center mb-2">
@@ -65,7 +68,7 @@ const CareerDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/jobs/${id}`)
+      .get(`${API_BASE_URL}/api/jobs/${id}`)
       .then((res) => {
         setJob(res.data);
         setLoading(false);
@@ -105,12 +108,12 @@ const CareerDetail = () => {
       } else {
         update[modal.field] = editArray;
       }
-      await axios.put(`http://localhost:5000/api/jobs/${job._id}`, update);
+      await axios.put(`${API_BASE_URL}/api/jobs/${job._id}`, update);
       setModal({ open: false, field: null });
       setEditValue("");
       setEditArray([]);
       // Refresh data
-      const res = await axios.get(`http://localhost:5000/api/jobs/${job._id}`);
+      const res = await axios.get(`${API_BASE_URL}/api/jobs/${job._id}`);
       setJob(res.data);
     } catch (err) {
       alert("Failed to update: " + err.message);

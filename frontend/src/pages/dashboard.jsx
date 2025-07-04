@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "./components/Modal.jsx";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const EditIcon = ({ onClick }) => (
   <button
     onClick={onClick}
@@ -31,10 +34,10 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const [jobsRes, servicesRes, siteConfigRes, aboutRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/jobs"),
-          axios.get("http://localhost:5000/api/services"),
-          axios.get("http://localhost:5000/api/site-config"),
-          axios.get("http://localhost:5000/api/about")
+          axios.get(`${API_BASE_URL}/api/jobs`),
+          axios.get(`${API_BASE_URL}/api/services`),
+          axios.get(`${API_BASE_URL}/api/site-config`),
+          axios.get(`${API_BASE_URL}/api/about`)
         ]);
         setStats({
           jobs: jobsRes.data.length,
@@ -50,7 +53,7 @@ const Dashboard = () => {
       }
     };
     fetchStats();
-  }, []);
+  }, [API_BASE_URL]);
 
   if (loading) return <div className="p-10">Loading dashboard...</div>;
   if (error) return <div className="p-10 text-red-500">Error: {error}</div>;
@@ -125,15 +128,15 @@ const Dashboard = () => {
         logoUrl = editCompany.logoPreview;
       }
       // Update site config
-      await axios.put(`http://localhost:5000/api/site-config/${stats.siteConfig._id}`, {
+      await axios.put(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}`, {
         siteName: editCompany.name,
         logoUrl,
       });
       // Refresh dashboard data
       const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/jobs"),
-        axios.get("http://localhost:5000/api/services"),
-        axios.get("http://localhost:5000/api/site-config")
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
       ]);
       setStats({
         jobs: jobsRes.data.length,
@@ -153,14 +156,14 @@ const Dashboard = () => {
     if (!stats.siteConfig) return;
     setSaving(true);
     try {
-      await axios.put(`http://localhost:5000/api/site-config/${stats.siteConfig._id}`, {
+      await axios.put(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}`, {
         contactEmails: editEmails.list,
       });
       // Refresh dashboard data
       const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/jobs"),
-        axios.get("http://localhost:5000/api/services"),
-        axios.get("http://localhost:5000/api/site-config")
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
       ]);
       setStats({
         jobs: jobsRes.data.length,
@@ -180,14 +183,14 @@ const Dashboard = () => {
     if (!stats.siteConfig) return;
     setSaving(true);
     try {
-      await axios.put(`http://localhost:5000/api/site-config/${stats.siteConfig._id}`, {
+      await axios.put(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}`, {
         contactPhones: editPhones.list,
       });
       // Refresh dashboard data
       const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/jobs"),
-        axios.get("http://localhost:5000/api/services"),
-        axios.get("http://localhost:5000/api/site-config")
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
       ]);
       setStats({
         jobs: jobsRes.data.length,
@@ -207,14 +210,14 @@ const Dashboard = () => {
     if (!stats.siteConfig) return;
     setSaving(true);
     try {
-      await axios.put(`http://localhost:5000/api/site-config/${stats.siteConfig._id}`, {
+      await axios.put(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}`, {
         contactAddress: editAddress,
       });
       // Refresh dashboard data
       const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/jobs"),
-        axios.get("http://localhost:5000/api/services"),
-        axios.get("http://localhost:5000/api/site-config")
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
       ]);
       setStats({
         jobs: jobsRes.data.length,

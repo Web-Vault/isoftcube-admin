@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const ViewIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><title>View</title><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
 );
@@ -37,7 +40,7 @@ const Services = () => {
 
   const fetchServices = () => {
     setLoading(true);
-    axios.get("http://localhost:5000/api/services")
+    axios.get(`${API_BASE_URL}/api/services`)
       .then(res => {
         setServices(res.data);
         setLoading(false);
@@ -56,7 +59,7 @@ const Services = () => {
     if (!deleteModal.service) return;
     setDeleting(true);
     try {
-      await axios.delete(`http://localhost:5000/api/services/${deleteModal.service._id}`);
+      await axios.delete(`${API_BASE_URL}/api/services/${deleteModal.service._id}`);
       setDeleteModal({ open: false, service: null });
       fetchServices();
     } catch (err) {

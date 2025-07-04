@@ -8,8 +8,10 @@ const Sidebar = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
+  const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/site-config")
+    axios.get(`${API_BASE_URL}/api/site-config`)
       .then(res => {
         setSiteConfig(res.data[0] || null);
         setLoading(false);

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const EditIcon = ({ onClick }) => (
   <button
     onClick={onClick}
@@ -83,7 +86,7 @@ const ServiceDetail = () => {
 
   const fetchService = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/services/${id}`);
+      const res = await axios.get(`${API_BASE_URL}/api/services/${id}`);
       setService(res.data);
       setLoading(false);
     } catch (err) {
@@ -123,7 +126,7 @@ const ServiceDetail = () => {
         } else {
           update[modal.field] = editArray;
         }
-        await axios.put(`http://localhost:5000/api/services/${service._id}`, update);
+        await axios.put(`${API_BASE_URL}/api/services/${service._id}`, update);
       } else {
         // Sub-service
         const subServices = [...service.subServices];
@@ -132,7 +135,7 @@ const ServiceDetail = () => {
         } else {
           subServices[modal.subIdx][modal.field] = editArray;
         }
-        await axios.put(`http://localhost:5000/api/services/${service._id}`, { subServices });
+        await axios.put(`${API_BASE_URL}/api/services/${service._id}`, { subServices });
       }
       setModal({ open: false, field: null, subIdx: null });
       setEditValue("");

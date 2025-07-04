@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const SectionCard = ({ title, children, onEdit }) => (
   <div className="bg-white rounded-xl shadow p-6 mb-6 relative">
     <div className="flex items-center justify-between mb-3">
@@ -27,7 +30,7 @@ const About = () => {
   const [addValueModal, setAddValueModal] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/about")
+    axios.get(`${API_BASE_URL}/api/about`)
       .then(res => {
         setAbout(res.data);
         setLoading(false);
@@ -36,7 +39,7 @@ const About = () => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [API_BASE_URL]);
 
   if (loading) return <div className="p-10">Loading about page...</div>;
   if (error) return <div className="p-10 text-red-500">Error: {error}</div>;
@@ -150,14 +153,14 @@ const About = () => {
             e.preventDefault();
             if (modal.type === "section" && aboutId != null && modal.idx != null) {
               // PATCH to backend
-              const res = await axios.patch(`http://localhost:5000/api/about/${aboutId}/section/${modal.idx}`, {
+              const res = await axios.patch(`${API_BASE_URL}/api/about/${aboutId}/section/${modal.idx}`, {
                 title: fields.title,
                 content: fields.content
               });
               setAbout([res.data]);
             } else if (modal.type === "member" && aboutId != null && modal.idx != null) {
               // PATCH to backend
-              const res = await axios.patch(`http://localhost:5000/api/about/${aboutId}/member/${modal.idx}`, {
+              const res = await axios.patch(`${API_BASE_URL}/api/about/${aboutId}/member/${modal.idx}`, {
                 name: fields.name,
                 role: fields.role,
                 bio: fields.bio
@@ -165,7 +168,7 @@ const About = () => {
               setAbout([res.data]);
             } else if (modal.type === "value" && aboutId != null && modal.idx != null) {
               // PATCH to backend
-              const res = await axios.patch(`http://localhost:5000/api/about/${aboutId}/value/${modal.idx}`, {
+              const res = await axios.patch(`${API_BASE_URL}/api/about/${aboutId}/value/${modal.idx}`, {
                 title: fields.title,
                 content: fields.content
               });
@@ -222,7 +225,7 @@ const About = () => {
           <form onSubmit={async e => {
             e.preventDefault();
             if (aboutId) {
-              const res = await axios.post(`http://localhost:5000/api/about/${aboutId}/section`, {
+              const res = await axios.post(`${API_BASE_URL}/api/about/${aboutId}/section`, {
                 title: e.target.title.value,
                 content: e.target.content.value
               });
@@ -260,7 +263,7 @@ const About = () => {
           <form onSubmit={async e => {
             e.preventDefault();
             if (aboutId) {
-              const res = await axios.post(`http://localhost:5000/api/about/${aboutId}/member`, {
+              const res = await axios.post(`${API_BASE_URL}/api/about/${aboutId}/member`, {
                 name: e.target.name.value,
                 role: e.target.role.value,
                 bio: e.target.bio.value
@@ -309,7 +312,7 @@ const About = () => {
               className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-lg"
               onClick={async () => {
                 if (aboutId != null && deleteConfirm.idx !== null) {
-                  const res = await axios.delete(`http://localhost:5000/api/about/${aboutId}/member/${deleteConfirm.idx}`);
+                  const res = await axios.delete(`${API_BASE_URL}/api/about/${aboutId}/member/${deleteConfirm.idx}`);
                   setAbout([res.data]);
                 }
                 setDeleteConfirm({ open: false, idx: null, name: '' });
@@ -341,7 +344,7 @@ const About = () => {
               className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-lg"
               onClick={async () => {
                 if (aboutId != null && deleteValueConfirm.idx !== null) {
-                  const res = await axios.delete(`http://localhost:5000/api/about/${aboutId}/value/${deleteValueConfirm.idx}`);
+                  const res = await axios.delete(`${API_BASE_URL}/api/about/${aboutId}/value/${deleteValueConfirm.idx}`);
                   setAbout([res.data]);
                 }
                 setDeleteValueConfirm({ open: false, idx: null, title: '' });
@@ -367,7 +370,7 @@ const About = () => {
           <form onSubmit={async e => {
             e.preventDefault();
             if (aboutId) {
-              const res = await axios.post(`http://localhost:5000/api/about/${aboutId}/value`, {
+              const res = await axios.post(`${API_BASE_URL}/api/about/${aboutId}/value`, {
                 title: e.target.title.value,
                 content: e.target.content.value
               });
@@ -411,7 +414,7 @@ const About = () => {
                       aria-label={`Delete ${section.title}`}
                       onClick={async () => {
                         if (aboutId != null) {
-                          const res = await axios.delete(`http://localhost:5000/api/about/${aboutId}/section/${idx}`);
+                          const res = await axios.delete(`${API_BASE_URL}/api/about/${aboutId}/section/${idx}`);
                           setAbout([res.data]);
                         }
                       }}

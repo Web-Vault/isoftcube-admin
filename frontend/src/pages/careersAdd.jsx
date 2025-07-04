@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 function slugify(text) {
   return text
     .toString()
@@ -80,7 +83,7 @@ const CareersAdd = () => {
       benefits: form.benefits.filter(b => b && b.trim() !== ""),
     };
     try {
-      await axios.post("http://localhost:5000/api/jobs", payload);
+      await axios.post(`${API_BASE_URL}/api/jobs`, payload);
       navigate("/careers");
     } catch (err) {
       if (err.response?.data?.error && err.response.data.error.includes('duplicate key')) {

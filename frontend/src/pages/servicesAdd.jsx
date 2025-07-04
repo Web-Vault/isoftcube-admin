@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Define API base URL from env
+const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
+
 const emptySubService = { name: "", description: "", features: [""], technologies: [""] };
 
 const ServicesAdd = () => {
@@ -18,9 +21,19 @@ const ServicesAdd = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [slugEdited, setSlugEdited] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => {
+      if (name === "title" && !slugEdited) {
+        return { ...prev, title: value, slug: slugify(value) };
+      }
+      if (name === "slug") {
+        setSlugEdited(true);
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleArrayChange = (field, idx, value) => {
@@ -102,7 +115,7 @@ const ServicesAdd = () => {
     console.log("Submitting service:", payload);
 
     try {
-      await axios.post("http://localhost:5000/api/services", payload);
+      await axios.post(`${API_BASE_URL}/api/services`, payload);
       navigate("/services");
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -216,5 +229,16 @@ const ServicesAdd = () => {
     </div>
   );
 };
+
+// Add slugify function
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-');
+}
 
 export default ServicesAdd; 

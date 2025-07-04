@@ -28,5 +28,10 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/site-config', siteConfigRoutes);
 
+// Add root route for health check
+app.get('/', (req, res) => {
+  res.send('API Server is running');
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
