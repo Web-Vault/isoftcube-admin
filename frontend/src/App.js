@@ -9,6 +9,7 @@ import About from "./pages/about.jsx";
 import Sidebar from "./pages/components/sidebar.jsx";
 import ServicesAdd from "./pages/servicesAdd";
 import CareersAdd from "./pages/careersAdd";
+import JobApplications from "./pages/JobApplications.jsx";
 import "./App.css";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/careers/:id" element={<CareerDetail />} />
+            <Route path="/careers/:jobId/applications" element={<JobApplications />} />
             <Route path="/about" element={<About />} />
             <Route path="/services/add" element={<ServicesAdd />} />
             <Route path="/careers/add" element={<CareersAdd />} />

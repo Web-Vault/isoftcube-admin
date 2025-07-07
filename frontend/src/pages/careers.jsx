@@ -37,6 +37,7 @@ const Careers = () => {
   const [error, setError] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ open: false, job: null });
   const [deleting, setDeleting] = useState(false);
+  const [applicationsByJob, setApplicationsByJob] = useState({});
 
   const fetchJobs = () => {
     setLoading(true);
@@ -51,8 +52,27 @@ const Careers = () => {
       });
   };
 
+  const fetchApplications = () => {
+    axios.get(`${API_BASE_URL}/api/jobs/applications`)
+      .then(res => {
+        // Group applications by jobId (support populated jobId) and only count non-replied
+        const grouped = {};
+        res.data.forEach(app => {
+          if (app.replied) return; // skip replied applications
+          const jobId = app.jobId && typeof app.jobId === 'object' ? app.jobId._id : app.jobId;
+          if (!grouped[jobId]) grouped[jobId] = [];
+          grouped[jobId].push(app);
+        });
+        setApplicationsByJob(grouped);
+      })
+      .catch(err => {
+        // Optionally handle error
+      });
+  };
+
   useEffect(() => {
     fetchJobs();
+    fetchApplications();
   }, []);
 
   const handleDelete = async () => {
@@ -102,6 +122,15 @@ const Careers = () => {
                 >
                   <ViewIcon />
                 </Link>
+                {applicationsByJob[job._id] && applicationsByJob[job._id].length > 0 && (
+                  <Link
+                    to={`/careers/${job._id}/applications`}
+                    className="p-2 rounded hover:bg-green-100 text-green-600 transition"
+                    title="View Applications"
+                  >
+                    Applications ({applicationsByJob[job._id].length})
+                  </Link>
+                )}
                 <button
                   className="p-2 rounded hover:bg-red-100 text-red-600 transition"
                   title="Delete"
