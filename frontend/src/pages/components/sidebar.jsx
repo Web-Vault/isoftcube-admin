@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import { FaHome, FaServicestack, FaBriefcase, FaInfoCircle } from "react-icons/fa";
+import { FaHome, FaServicestack, FaBriefcase, FaInfoCircle, FaEnvelopeOpenText } from "react-icons/fa";
 
 const Sidebar = () => {
   const [siteConfig, setSiteConfig] = useState(null);
@@ -24,6 +24,7 @@ const Sidebar = () => {
     { to: "/services", label: "Services", icon: <FaServicestack /> },
     { to: "/careers", label: "Careers", icon: <FaBriefcase /> },
     { to: "/about", label: "About", icon: <FaInfoCircle /> },
+    { to: "/contact-submissions", label: "Contact Submissions", icon: <FaEnvelopeOpenText /> },
   ];
 
   return (

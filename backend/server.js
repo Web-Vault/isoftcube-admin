@@ -6,6 +6,7 @@ import serviceRoutes from './routes/service.js';
 import jobRoutes from './routes/job.js';
 import aboutRoutes from './routes/about.js';
 import siteConfigRoutes from './routes/siteConfig.js';
+import contactSubmissionRoutes from './routes/contactSubmission.js';
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/site-config', siteConfigRoutes);
+app.use('/api/contact-submissions', contactSubmissionRoutes);
 
 // Add root route for health check
 app.get('/', (req, res) => {

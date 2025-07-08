@@ -10,6 +10,8 @@ import Sidebar from "./pages/components/sidebar.jsx";
 import ServicesAdd from "./pages/servicesAdd";
 import CareersAdd from "./pages/careersAdd";
 import JobApplications from "./pages/JobApplications.jsx";
+import ContactSubmissions from "./pages/ContactSubmissions.jsx";
+
 import "./App.css";
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/services/add" element={<ServicesAdd />} />
             <Route path="/careers/add" element={<CareersAdd />} />
+            <Route path="/contact-submissions" element={<ContactSubmissions />} /> 
           </Routes>
         </main>
       </div>
