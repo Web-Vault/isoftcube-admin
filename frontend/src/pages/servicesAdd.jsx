@@ -134,7 +134,7 @@ const ServicesAdd = () => {
         </div>
         <div>
           <label className="block font-medium mb-1">Slug</label>
-          <input name="slug" value={form.slug} onChange={handleChange} className="w-full border rounded px-3 py-2" required />
+          <input name="slug" value={form.slug} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="Auto-generated from title" readOnly disabled  />
         </div>
         <div>
           <label className="block font-medium mb-1">Tagline</label>

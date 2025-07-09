@@ -11,6 +11,9 @@ import ServicesAdd from "./pages/servicesAdd";
 import CareersAdd from "./pages/careersAdd";
 import JobApplications from "./pages/JobApplications.jsx";
 import ContactSubmissions from "./pages/ContactSubmissions.jsx";
+import Blogs from "./pages/blogs.jsx";
+import BlogDetail from "./pages/blogDetail.jsx";
+import BlogAdd from "./pages/blogAdd.jsx";
 
 import "./App.css";
 
@@ -32,7 +35,10 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/services/add" element={<ServicesAdd />} />
             <Route path="/careers/add" element={<CareersAdd />} />
-            <Route path="/contact-submissions" element={<ContactSubmissions />} /> 
+            <Route path="/contact-submissions" element={<ContactSubmissions />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/blogs/:id" element={<BlogDetail />} />
+            <Route path="/blogs/add" element={<BlogAdd />} />
           </Routes>
         </main>
       </div>
