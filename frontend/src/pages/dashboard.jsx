@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [editAddress, setEditAddress] = useState("");
   const [saving, setSaving] = useState(false);
   const [teamMembersCount, setTeamMembersCount] = useState(0);
+  const [editSupportEmail, setEditSupportEmail] = useState("");
+  const [editSupportAppPassword, setEditSupportAppPassword] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -233,6 +235,58 @@ const Dashboard = () => {
     }
   };
 
+  const handleSupportEmailSave = async (e) => {
+    e.preventDefault();
+    if (!stats.siteConfig) return;
+    setSaving(true);
+    try {
+      await axios.post(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}/support-email`, {
+        supportEmail: editSupportEmail,
+        supportAppPassword: editSupportAppPassword,
+      });
+      // Refresh dashboard data
+      const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
+      ]);
+      setStats({
+        jobs: jobsRes.data.length,
+        services: servicesRes.data.length,
+        siteConfig: siteConfigRes.data[0] || null
+      });
+      setEditModal(null);
+    } catch (err) {
+      alert("Failed to update support email: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSupportEmailRemove = async () => {
+    if (!stats.siteConfig) return;
+    setSaving(true);
+    try {
+      await axios.delete(`${API_BASE_URL}/api/site-config/${stats.siteConfig._id}/support-email`);
+      // Refresh dashboard data
+      const [jobsRes, servicesRes, siteConfigRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/jobs`),
+        axios.get(`${API_BASE_URL}/api/services`),
+        axios.get(`${API_BASE_URL}/api/site-config`)
+      ]);
+      setStats({
+        jobs: jobsRes.data.length,
+        services: servicesRes.data.length,
+        siteConfig: siteConfigRes.data[0] || null
+      });
+      setEditModal(null);
+    } catch (err) {
+      alert("Failed to remove support email: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="p-6 w-full">
       {/* Dashboard Page Header */}
@@ -302,6 +356,20 @@ const Dashboard = () => {
               <div className="text-gray-400">N/A</div>
             )}
           </div>
+        </div>
+      )}
+      {/* Support Email Section */}
+      {siteConfig && (
+        <div className="bg-white p-6 rounded-xl shadow mb-8 w-full">
+          <div className="flex items-center mb-2">
+            <div className="font-semibold text-blue-500">Support Email</div>
+            <EditIcon onClick={() => {
+              setEditSupportEmail(siteConfig.supportEmail || "");
+              setEditSupportAppPassword(siteConfig.supportAppPassword || "");
+              setEditModal("supportEmail");
+            }} />
+          </div>
+          <div className="text-gray-700">{siteConfig.supportEmail || 'N/A'}</div>
         </div>
       )}
       {/* Address Card */}
@@ -474,6 +542,46 @@ const Dashboard = () => {
             <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" disabled={saving}>
               {saving ? "Saving..." : "Save"}
             </button>
+          </div>
+        </form>
+      </Modal>
+      {/* Support Email Modal */}
+      <Modal open={editModal === "supportEmail"} onClose={() => setEditModal(null)} title="Edit Support Email">
+        <form className="flex flex-col gap-4" onSubmit={handleSupportEmailSave}>
+          <label className="block">
+            <span className="text-gray-700 font-medium">Support Email</span>
+            <input
+              type="email"
+              className="mt-1 block w-full border rounded px-3 py-2"
+              value={editSupportEmail}
+              onChange={e => setEditSupportEmail(e.target.value)}
+              disabled={saving}
+            />
+          </label>
+          <label className="block">
+            <span className="text-gray-700 font-medium">App Password</span>
+            <input
+              type="password"
+              className="mt-1 block w-full border rounded px-3 py-2"
+              value={editSupportAppPassword}
+              onChange={e => setEditSupportAppPassword(e.target.value)}
+              disabled={saving}
+            />
+          </label>
+          <div className="flex justify-between gap-2 mt-2">
+            <div>
+              <button type="button" className="px-4 py-2 rounded bg-red-200 text-red-700 hover:bg-red-300" onClick={handleSupportEmailRemove} disabled={saving}>
+                Remove Support Email
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setEditModal(null)} disabled={saving}>
+                Cancel
+              </button>
+              <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>

@@ -12,6 +12,8 @@ const SiteConfigSchema = new mongoose.Schema({
   contactEmails: [String],
   contactPhones: [String],
   contactAddress: String,
+  supportEmail: String,
+  supportAppPassword: String,
   socialLinks: {
     facebook: String,
     twitter: String,

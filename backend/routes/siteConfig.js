@@ -57,4 +57,43 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Add or update support email and app password
+router.post('/:id/support-email', async (req, res) => {
+  const { supportEmail, supportAppPassword } = req.body;
+  if (!supportEmail || !supportAppPassword) {
+    return res.status(400).json({ error: 'Support email and app password are required.' });
+  }
+  // Simple email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(supportEmail)) {
+    return res.status(400).json({ error: 'Invalid email format.' });
+  }
+  try {
+    const config = await SiteConfig.findByIdAndUpdate(
+      req.params.id,
+      { supportEmail, supportAppPassword },
+      { new: true }
+    );
+    if (!config) return res.status(404).json({ error: 'Site config not found' });
+    res.json(config);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Remove support email and app password
+router.delete('/:id/support-email', async (req, res) => {
+  try {
+    const config = await SiteConfig.findByIdAndUpdate(
+      req.params.id,
+      { $unset: { supportEmail: "", supportAppPassword: "" } },
+      { new: true }
+    );
+    if (!config) return res.status(404).json({ error: 'Site config not found' });
+    res.json(config);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 export default router; 

@@ -1,6 +1,7 @@
 import express from 'express';
 import ContactSubmission from '../models/ContactSubmission.js';
 import nodemailer from 'nodemailer';
+import SiteConfig from '../models/SiteConfig.js';
 
 const router = express.Router();
 
@@ -22,16 +23,24 @@ router.post('/:id/reply', async (req, res) => {
   try {
     const submission = await ContactSubmission.findById(id);
     if (!submission) return res.status(404).json({ error: 'Submission not found' });
+    // Fetch support email and app password from SiteConfig
+    const siteConfig = await SiteConfig.findOne();
+    console.log('siteConfig:', siteConfig);
+     
+    const supportEmail = siteConfig?.supportEmail || process.env.SMTP_USER;
+    const supportAppPassword = siteConfig?.supportAppPassword || process.env.SMTP_PASS;
+    console.log('supportEmail:', supportEmail);
+    console.log('supportAppPassword:', supportAppPassword);
     // Send email using nodemailer
     const transporter = nodemailer.createTransport({
       service: process.env.SMTP_SERVICE || 'gmail',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: supportEmail,
+        pass: supportAppPassword,
       },
     });
     const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: supportEmail,
       to: submission.email,
       subject: `Reply to your contact submission`,
       html: `<p>Dear ${submission.name},</p><p>${reply.replace(/\n/g, '<br>')}</p><p>Best regards,<br>Admin Team</p>`

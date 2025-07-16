@@ -2,6 +2,7 @@ import express from 'express';
 import Job from '../models/Job.js';
 import JobApplication from '../models/JobApplication.js';
 import nodemailer from 'nodemailer';
+import SiteConfig from '../models/SiteConfig.js';
 
 const router = express.Router();
 
@@ -89,17 +90,21 @@ router.post('/applications/:applicationId/reply', async (req, res) => {
     if (!application) return res.status(404).json({ error: 'Application not found' });
     // Fetch the job to get its title
     const job = await Job.findById(application.jobId);
+    // Fetch support email and app password from SiteConfig
+    const siteConfig = await SiteConfig.findOne();
+    const supportEmail = siteConfig?.supportEmail || process.env.SMTP_USER;
+    const supportAppPassword = siteConfig?.supportAppPassword || process.env.SMTP_PASS;
     // Send email using nodemailer
     // Configure your transporter (use your SMTP credentials or a test account)
     const transporter = nodemailer.createTransport({
       service: process.env.SMTP_SERVICE || 'gmail',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: supportEmail,
+        pass: supportAppPassword,
       },
     });
     const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: supportEmail,
       to: application.email,
       subject: `Reply to your job application for ${job ? job.title : application.jobId}`,
       html: `<p>Dear ${application.name},</p><p>${reply.replace(/\n/g, '<br>')}</p><p>Best regards,<br>Admin Team</p>`
