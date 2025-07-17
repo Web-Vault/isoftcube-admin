@@ -38,6 +38,7 @@ const Careers = () => {
   const [deleteModal, setDeleteModal] = useState({ open: false, job: null });
   const [deleting, setDeleting] = useState(false);
   const [applicationsByJob, setApplicationsByJob] = useState({});
+  const [repliedApplicationsByJob, setRepliedApplicationsByJob] = useState({});
 
   const fetchJobs = () => {
     setLoading(true);
@@ -55,15 +56,21 @@ const Careers = () => {
   const fetchApplications = () => {
     axios.get(`${API_BASE_URL}/api/jobs/applications`)
       .then(res => {
-        // Group applications by jobId (support populated jobId) and only count non-replied
-        const grouped = {};
+        // Group applications by jobId (support populated jobId)
+        const nonReplied = {};
+        const replied = {};
         res.data.forEach(app => {
-          if (app.replied) return; // skip replied applications
           const jobId = app.jobId && typeof app.jobId === 'object' ? app.jobId._id : app.jobId;
-          if (!grouped[jobId]) grouped[jobId] = [];
-          grouped[jobId].push(app);
+          if (app.replied) {
+            if (!replied[jobId]) replied[jobId] = [];
+            replied[jobId].push(app);
+          } else {
+            if (!nonReplied[jobId]) nonReplied[jobId] = [];
+            nonReplied[jobId].push(app);
+          }
         });
-        setApplicationsByJob(grouped);
+        setApplicationsByJob(nonReplied);
+        setRepliedApplicationsByJob(replied);
       })
       .catch(err => {
         // Optionally handle error
@@ -107,40 +114,52 @@ const Careers = () => {
         <p className="text-gray-700">No job vacancies found.</p>
       ) : (
         <div className="flex flex-col gap-6">
-          {jobs.map(job => (
-            <div key={job._id} className="bg-white p-6 rounded-lg shadow flex flex-col md:flex-row md:items-center md:justify-between">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-bold text-blue-500 mb-1">{job.title}</h2>
-                {job.shortDescription && <div className="text-gray-600 mb-1">{job.shortDescription}</div>}
-                <p className="text-gray-600 mb-0 line-clamp-2">{job.description}</p>
-              </div>
-              <div className="flex gap-2 mt-4 md:mt-0 md:ml-4 shrink-0 self-end md:self-center">
-                <Link
-                  to={`/careers/${job._id}`}
-                  className="p-2 rounded hover:bg-blue-100 text-blue-600 transition"
-                  title="View"
-                >
-                  <ViewIcon />
-                </Link>
-                {applicationsByJob[job._id] && applicationsByJob[job._id].length > 0 && (
+          {jobs.map(job => {
+            const nonRepliedApps = applicationsByJob[job._id] || [];
+            const repliedApps = repliedApplicationsByJob[job._id] || [];
+            return (
+              <div key={job._id} className="bg-white p-6 rounded-lg shadow flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-blue-500 mb-1">{job.title}</h2>
+                  {job.shortDescription && <div className="text-gray-600 mb-1">{job.shortDescription}</div>}
+                  <p className="text-gray-600 mb-0 line-clamp-2">{job.description}</p>
+                </div>
+                <div className="flex gap-2 mt-4 md:mt-0 md:ml-4 shrink-0 self-end md:self-center">
                   <Link
-                    to={`/careers/${job._id}/applications`}
-                    className="p-2 rounded hover:bg-green-100 text-green-600 transition"
-                    title="View Applications"
+                    to={`/careers/${job._id}`}
+                    className="p-2 rounded hover:bg-blue-100 text-blue-600 transition"
+                    title="View"
                   >
-                    Applications ({applicationsByJob[job._id].length})
+                    <ViewIcon />
                   </Link>
-                )}
-                <button
-                  className="p-2 rounded hover:bg-red-100 text-red-600 transition"
-                  title="Delete"
-                  onClick={() => setDeleteModal({ open: true, job })}
-                >
-                  <DeleteIcon />
-                </button>
+                  {nonRepliedApps.length > 0 ? (
+                    <Link
+                      to={`/careers/${job._id}/applications`}
+                      className="p-2 rounded hover:bg-green-100 text-green-600 transition"
+                      title="View Applications"
+                    >
+                      Applications ({nonRepliedApps.length})
+                    </Link>
+                  ) : repliedApps.length > 0 ? (
+                    <Link
+                      to={`/careers/${job._id}/applications?show=replied`}
+                      className="p-2 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 transition"
+                      title="View Replied Applications"
+                    >
+                      Replied ({repliedApps.length})
+                    </Link>
+                  ) : null}
+                  <button
+                    className="p-2 rounded hover:bg-red-100 text-red-600 transition"
+                    title="Delete"
+                    onClick={() => setDeleteModal({ open: true, job })}
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       <Modal open={deleteModal.open} onClose={() => setDeleteModal({ open: false, job: null })} title="Delete Job">

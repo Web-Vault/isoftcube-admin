@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL || '';
 
@@ -25,6 +25,8 @@ const Modal = ({ open, onClose, title, children }) => {
 
 const JobApplications = () => {
   const { jobId } = useParams();
+  const location = useLocation();
+  const repliedSectionRef = React.useRef(null);
   const [applications, setApplications] = useState([]);
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,10 @@ const JobApplications = () => {
   const [sending, setSending] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Split applications into non-replied and replied
+  const nonRepliedApps = applications.filter(app => !app.replied);
+  const repliedApps = applications.filter(app => app.replied);
 
   useEffect(() => {
     setLoading(true);
@@ -60,6 +66,14 @@ const JobApplications = () => {
     }
   }, [successMsg]);
 
+  useEffect(() => {
+    // Scroll to replied section if query param is set
+    const params = new URLSearchParams(location.search);
+    if (params.get('show') === 'replied' && repliedSectionRef.current) {
+      repliedSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [location.search, repliedApps.length]);
+
   const handleSendReply = async () => {
     if (!replyModal.application || !replyText.trim()) return;
     setSending(true);
@@ -82,10 +96,6 @@ const JobApplications = () => {
       setSending(false);
     }
   };
-
-  // Split applications into non-replied and replied
-  const nonRepliedApps = applications.filter(app => !app.replied);
-  const repliedApps = applications.filter(app => app.replied);
 
   if (loading) return <div className="p-10">Loading applications...</div>;
   if (error) return <div className="p-10 text-red-500">Error: {error}</div>;
@@ -146,7 +156,7 @@ const JobApplications = () => {
         </div>
       )}
       {repliedApps.length > 0 && (
-        <div className="mt-10">
+        <div className="mt-10" ref={repliedSectionRef}>
           <h2 className="text-xl font-bold text-green-700 mb-4">Replied Applications</h2>
           <div className="flex flex-col gap-6">
             {repliedApps.map(app => (
